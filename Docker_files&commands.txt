@@ -1,0 +1,96 @@
+961  docker run -d --memory-reservation=256m -m 512m --name tstcnt nginx
+  962  docker ps
+  963  docker stats
+  964  docker inspect tstcnt
+  965  docker update --memory 1024 tstcnt
+  966  docker update --memory 1024m tstcnt
+  967  docker stats
+  968  docker run --cpus-0.5 -d nginx
+  969  docker run --cpus=0.5 -d nginx
+  970  docker ps
+  971  docker inspect 6b100543a7f5
+  972  ls
+  973  cd multi-build/
+  974  ls
+  975  cat Dockerfile
+  976  cat main.go 
+  977  docker build -t go-image .
+  978  docker images
+  979  docker run go-image
+  980  ls
+  981  cat Dockerfile_apl 
+  982  ls
+  983  pwd
+  984  docker build -t go-alpine -f Dockerfile_apl .
+  985  docker images
+  986  docker run go-alpine
+  987  ls
+  988  cat Dockerfile_dsl 
+  989  docker build -t go-distro Dockerfile_dsl .
+  990  docker build -t go-distro -f Dockerfile_dsl .
+  991  docker images
+  992  docker run go-distro
+  993  ls
+  994  cat Dockerfile
+  995  cat Dockerfile_scr 
+  996  docker build -t go-scr -f Dockerfile_scr .
+  997  cat Dockerfile_scr 
+  998  docker images
+  999  docker run go-scr
+ 1000  ls
+ 1001  cat Dockerfile
+ 1002  clear
+ 1003  cat Dockerfile
+ 1004  docker pull golang:1.23
+ 1005  docker images
+ 1006  ls
+
+-----------------------------
+Docker file for normal image,
+
+FROM golang:1.23
+WORKDIR /src
+COPY main.go /src
+RUN go build -o /bin/myapp ./main.go
+CMD ["/bin/myapp"]
+----------------------
+
+Docker file for multistage build with alpine image
+
+FROM golang:1.23 AS build
+WORKDIR /src
+COPY main.go /src
+RUN go build -o /bin/myapp ./main.go
+FROM alpine
+COPY --from-build /bin/myapp /bin/hello-app/myapp
+CMD ["/bin/hello-app/myapp"]
+
+-------------------------------------
+
+Docker file for multistage build with distroless image
+
+root@ip-172-31-24-58:~/multi-build# cat Dockerfile_dsl 
+# Stage 1: Build stage with Go
+FROM golang:1.23 AS build
+WORKDIR /src
+COPY main.go /src
+RUN go build -o /bin/myapp ./main.go
+
+# Stage 2: Final stage with Distroless
+FROM gcr.io/distroless/base
+COPY --from=build /bin/myapp /bin/hello-app/myapp
+CMD ["/bin/hello-app/myapp"]
+
+-------------------------------------------
+
+Docker file for  multistage build with Scratch image
+
+FROM golang:1.23 as build
+WORKDIR /src
+COPY main.go /src
+RUN go build -o /bin/myapp ./main.go
+FROM scratch
+COPY --from=build /bin/myapp /bin/hello-app/myapp
+CMD ["/bin/hello-app/myapp"]
+
+-------------------------------

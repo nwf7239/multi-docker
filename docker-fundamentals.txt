@@ -1,0 +1,96 @@
+263  docker --version
+  264  docker pull nginx
+  265  docker images
+  266  docker inspect f876bfc1cc63
+  267  ls
+  268  docker images
+  269  docker run -d --name test-container -p 80:80 nginx
+  270  docker ps
+  271  docker images
+  272  docker tag nginx poornaprasath/nginx-test
+  273  docker imges
+  274  docker images
+  275  docker push poornaprasath/nginx-test
+  276  docker logout
+  277  docker tag poornaprasath/nginx-test poornaprasath/nginx-test:1.1
+  278  docker images
+  279  docker push poornaprasath/nginx-test:1.1
+  280  docker login -u poornaprasath
+  281  docker push poornaprasath/nginx-test:1.1
+  282  ls
+  283  cat app.py 
+  284  ls
+  285  cat Dockerfile 
+  286  clear
+  287  cat Dockerfile 
+  288  ls
+  289  docker build -t python-test-app .
+  290  docker images
+  291  docker network ls
+  292  docker network create app-network
+  293  docker network ls
+  294  docker volume create app_data
+  295  docker volume ls
+  296  docker inspect app_data
+  297  pwd
+  298  docker images
+  299  docker run -d --name python-container -v app_data:/app/data --network app-network -p 8000:8000 python-test-app
+  300  docker ps
+  301  docker exec -it python-container /bin/bash
+  302  docker inspect app_data
+  303  cd /var/lib/docker/volumes/app_data/_data
+  304  ls
+  305  cd
+  306  ls
+  307  mkdir host
+  308  ls
+  309  cd host/
+  310  ls
+  311  pwd
+  312  ls
+  313  touch test1 test2 test3
+  314  ls
+  315  docker run -d --name python-container-1 -v /root/host:/app/data --network app-network -p 8001:8000 python-test-app
+  316  docker ps
+  317  docker exec -it python-container-1 /bin/bash
+  318  ls
+  319  cd
+  320  history
+
+root@ip-172-31-88-77:~/docker# pwd
+/root/docker
+root@ip-172-31-88-77:~/docker# ls
+Dockerfile  app.py
+
+root@ip-172-31-88-77:~/docker# cat Dockerfile 
+FROM python:3.9-slim
+ 
+WORKDIR /app
+ 
+COPY app.py /app
+ 
+EXPOSE 8000
+ 
+CMD ["python", "app.py"]
+
+
+
+root@ip-172-31-88-77:~/docker# cat app.py 
+from http.server import BaseHTTPRequestHandler, HTTPServer
+ 
+class SimpleHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(b"Hello, Dockerized World!")
+ 
+def run():
+    server_address = ("0.0.0.0", 8000)
+    httpd = HTTPServer(server_address, SimpleHandler)
+    print("Server running on port 8000...")
+    httpd.serve_forever()
+ 
+if __name__ == "__main__":
+    run()
+root@ip-172-31-88-77:~/docker# 
